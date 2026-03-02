@@ -2,6 +2,7 @@
 #include "cpup/canis.h"
 #include "cpup/scene.h"
 #include "cpup/model.h"
+#include "cpup/inputmanager.h"
 
 #include <SDL3/SDL.h>
 
@@ -10,6 +11,8 @@ typedef struct {
     int rightScore;
 } Ball;
 
+Entity* SpawnBall(AppContext* _app, Entity* _entity);
+
 void BallStart(AppContext* _app, Entity* _entity) {
     _entity->color = InitVector4(1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -17,9 +20,13 @@ void BallStart(AppContext* _app, Entity* _entity) {
 }
 
 void BallUpdate(AppContext* _app, Entity* _entity) {
-    const bool* keys = SDL_GetKeyboardState(NULL);
 
-    if (Vec2EqualsZero(_entity->velocity) && keys[SDL_SCANCODE_SPACE])
+    if (GetKeyDown(_app, SDL_SCANCODE_P))
+    {
+        SpawnBall(_app, _entity);
+    }
+
+    if (Vec2EqualsZero(_entity->velocity) && GetKeyDown(_app, SDL_SCANCODE_SPACE))
     {
         i32 startingDirection = rand() % 4;
 
@@ -30,7 +37,7 @@ void BallUpdate(AppContext* _app, Entity* _entity) {
             (Vector2){-0.72f, -0.72f},
         };
 
-        _entity->velocity = Vec2Mul(directions[startingDirection], 50.0f);
+        _entity->velocity = Vec2Mul(directions[startingDirection], 150.0f);
     }
 
     // check if ball is heading below the screen
@@ -67,4 +74,19 @@ void BallDraw(AppContext* _app, Entity* _entity) {
 
 void BallOnDestroy(AppContext* _app, Entity* _entity) {
 
+}
+
+Entity* SpawnBall(AppContext* _app, Entity* _entity) {
+    void** scene = &(_app->scene);
+    Entity* ball = Spawn((Scene**)scene);
+    ball->transform.position = InitVector3(_app->windowWidth * 0.5f, _app->windowHeight * 0.5f, 0.0f);
+    ball->data = calloc(1, sizeof(Ball));
+    ball->image = _entity->image;
+    ball->model = _entity->model;
+    ball->shaderId = _entity->shaderId;
+    ball->Start = BallStart;
+    ball->Update = BallUpdate;
+    ball->Draw = BallDraw;
+    ball->OnDestroy = BallOnDestroy;
+    return ball;
 }

@@ -56,6 +56,12 @@ Entity* Spawn(Scene** _scene) {
 
     Entity* e = &(*_scene)->startEntities[index];
     e->id = (*_scene)->nextId++;
+    e->name = NULL;
+    e->transform.position = InitVector3(0.0f, 0.0f, 0.0f);
+    e->transform.rotation = 0.0f;
+    e->transform.scale = InitVector3(1.0f, 1.0f, 1.0f);
+    e->velocity = InitVector2(0.0f, 0.0f);
+    e->color = InitVector4(0.0f, 0.0f, 0.0f, 0.0f);
     e->data = NULL;
     e->Start = NULL;
     e->Update = NULL;
@@ -66,9 +72,16 @@ Entity* Spawn(Scene** _scene) {
 
 Entity* Find(Scene** _scene, const char* _name) {
     int count = vec_count(&(*_scene)->entities);
+
     for (int i = 0; i < count; i++)
         if (strcmp(_name, (*_scene)->entities[i].name) == 0)
             return &(*_scene)->entities[i];
+    
+    count = vec_count(&(*_scene)->startEntities);
+    
+    for (int i = 0; i < count; i++)
+        if (strcmp(_name, (*_scene)->startEntities[i].name) == 0)
+            return &(*_scene)->startEntities[i];
     
     return NULL;
 }
