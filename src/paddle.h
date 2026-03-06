@@ -1,20 +1,36 @@
 #pragma once
+#include "SDL3/SDL_scancode.h"
 #include "cpup/canis.h"
 #include "cpup/scene.h"
 #include "cpup/model.h"
+#include "cpup/inputmanager.h"
+#include <string.h>
 
 typedef struct {
     int var;
 } Paddle;
 
 void PaddleStart(AppContext* _app, Entity* _entity) {
-    _entity->color = InitVector4(1.0f, 1.0f, 1.0f, 1.0f);
     _entity->transform.rotation = 0.0f;
     _entity->transform.scale = InitVector3(32.0f, 128.0f, 1.0f);
 }
 
 void PaddleUpdate(AppContext* _app, Entity* _entity) {
+    if (GetKey(_app, SDL_SCANCODE_W) && strcmp(_entity->name, "rp")) {
+        _entity->transform.position.y += 5.0f;
+    }
 
+    if (GetKey(_app, SDL_SCANCODE_S) && strcmp(_entity->name, "rp")) {
+        _entity->transform.position.y -= 5.0f;
+    }
+
+    if (GetKey(_app, SDL_SCANCODE_UP) && strcmp(_entity->name, "lp")) {
+        _entity->transform.position.y += 5.0f;
+    }
+
+    if (GetKey(_app, SDL_SCANCODE_DOWN) && strcmp(_entity->name, "lp")) {
+        _entity->transform.position.y -= 5.0f;
+    }
 }
 
 void PaddleDraw(AppContext* _app, Entity* _entity) {

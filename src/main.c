@@ -85,8 +85,10 @@ int main(int argc, char *argv[])
     ball->OnDestroy = BallOnDestroy;
 
     Entity* leftPaddle = Spawn(&scene);
+    leftPaddle->name = "lp";
     leftPaddle->transform.position = InitVector3(16.0f, app.windowHeight * 0.5f, 0.0f);
     leftPaddle->data = calloc(1, sizeof(Paddle));
+    leftPaddle->color = InitVector4(1.0f, 0.0f, 0.0f, 1.0f);
     leftPaddle->image = &squareImage;
     leftPaddle->model = &model;
     leftPaddle->shaderId = shaderProgram;
@@ -96,11 +98,13 @@ int main(int argc, char *argv[])
     leftPaddle->OnDestroy = PaddleOnDestroy;
 
     Entity* rightPaddle = Spawn(&scene);
+    rightPaddle->name = "rp";
     rightPaddle->transform.position = InitVector3(app.windowWidth - 16.0f, app.windowHeight * 0.5f, 0.0f);
     rightPaddle->data = calloc(1, sizeof(Paddle));
     rightPaddle->image = &squareImage;
     rightPaddle->model = &model;
     rightPaddle->shaderId = shaderProgram;
+    rightPaddle->color = InitVector4(0.0f, 0.0f, 1.0f, 1.0f);
     rightPaddle->Start = PaddleStart;
     rightPaddle->Update = PaddleUpdate;
     rightPaddle->Draw = PaddleDraw;
@@ -109,7 +113,7 @@ int main(int argc, char *argv[])
     bool running = true;
     f32 time = 0.0f;
     while(running) {
-        // imput
+        // input
         InputManagerNewFrame(&app);
         //printf("FPS: %f Entity Count: %i\n", 1.0f/app.deltaTime, vec_count(&scene->entities));
 
