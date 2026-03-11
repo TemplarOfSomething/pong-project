@@ -12,8 +12,8 @@
 #include <SDL3/SDL.h>
 
 typedef struct {
-    int leftScore;
     int rightScore;
+    int leftScore;
 } Ball;
 
 Entity* l, *r, *b;
@@ -36,7 +36,9 @@ void BallStart(AppContext* _app, Entity* _entity) {
 }
 
 void BallUpdate(AppContext* _app, Entity* _entity) {
-
+    //easier data access
+    //Ball* bData = (Ball*)_entity->data;
+    
     if (GetKeyDown(_app, SDL_SCANCODE_P))
     {
         //SpawnBall(_app, _entity);
@@ -74,7 +76,7 @@ void BallUpdate(AppContext* _app, Entity* _entity) {
         _entity->velocity = InitVector2(0.0f, 0.0f);
         _entity->transform.position = InitVector3(_app->windowWidth * 0.5f, _app->windowHeight * 0.5f, 0.0f);
         // win
-        if (*(int *) (_entity->data) == 1) {
+        if (*(int *) (_entity->data) == 5) {
             Victory(_app, _entity);
         }
     }
@@ -87,7 +89,7 @@ void BallUpdate(AppContext* _app, Entity* _entity) {
         _entity->velocity = InitVector2(0.0f, 0.0f);
         _entity->transform.position = InitVector3(_app->windowWidth * 0.5f, _app->windowHeight * 0.5f, 0.0f);
         // win
-        if (*(int *) (_entity->data+4) == 1) {
+        if (*(int *) (_entity->data+4) == 5) {
             Victory(_app, _entity);
         }
     }
@@ -134,6 +136,7 @@ void BallDraw(AppContext* _app, Entity* _entity) {
 
     ShaderSetVector4(_entity->shaderId, "COLOR", _entity->color);
     ShaderBindTexture(_entity->shaderId, _entity->image->id, "MAIN_TEXTURE", 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     ShaderSetMatrix4(_entity->shaderId, "TRANSFORM", transform);
     DrawModel(*_entity->model);
 
@@ -164,6 +167,7 @@ void TrailBallUpdate(AppContext* _app, Entity* _entity) {
 void Victory(AppContext* _app, Entity* _entity) {
     for (int i = 0; i < 100; i++) {
         Entity* temp = SpawnBall(_app, _entity);
+        temp->name="t";
         temp->transform.scale = InitVector3(32.0f, 32.0f, 1.0f);
         temp->color = _entity->color;
         temp->transform.position = InitVector3(random_float(0.0f, _app->windowWidth), _app->windowHeight - 20.0f, 0.01f);

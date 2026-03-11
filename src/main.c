@@ -48,6 +48,7 @@ int main(int argc, char *argv[])
     Image containerImage = IOLoadImage("assets/textures/container.tga");
     Image circleImage = IOLoadImage("assets/textures/circle.tga");
     Image squareImage = IOLoadImage("assets/textures/square.tga");
+    Image gridImage = IOLoadImage("assets/textures/grid.tga");
     
     // build and compile our shader program
     u32 shaderProgram = GenerateShaderFromFiles("assets/shaders/logo.vs", "assets/shaders/logo.fs");
@@ -110,6 +111,19 @@ int main(int argc, char *argv[])
     ball->Update = BallUpdate;
     ball->Draw = BallDraw;
     ball->OnDestroy = BallOnDestroy;
+
+    Entity* bg = Spawn(&scene);
+    bg->transform.position = InitVector3(app.windowWidth * 0.5f, app.windowHeight * 0.5f, -0.1f);
+    bg->transform.scale = InitVector3(app.windowWidth, app.windowHeight, 1.0f);
+    bg->color = InitVector4(1.0f, 0.5f, 0.25f, 1.0f);
+    bg->data = calloc(1, sizeof(Ball));
+    bg->image = &gridImage;
+    bg->model = &model;
+    bg->shaderId = shaderProgram;
+    //bg->Start = BallStart;
+    //bg->Update = BallUpdate;
+    bg->Draw = BallDraw;
+    //bg->OnDestroy = BallOnDestroy;
 
     // trail
     for (int i = 0; i < 9; i++) {
