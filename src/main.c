@@ -111,6 +111,15 @@ int main(int argc, char *argv[])
     ball->Draw = BallDraw;
     ball->OnDestroy = BallOnDestroy;
 
+    // trail
+    for (int i = 0; i < 9; i++) {
+        Entity* trail = SpawnBall(&app, ball);
+        trail->color = InitVector4(1.0f, 1.0f, 1.0f, 1.0f);
+        trail->transform.scale = InitVector3(32.0f - (float) i*4, 32.0f - (float) i, 1.0f);
+        trail->Start = NULL;
+        trail->Update = TrailBallUpdate;
+    }
+
     bool running = true;
     f32 time = 0.0f;
     winTitle = title;

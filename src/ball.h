@@ -16,7 +16,7 @@ typedef struct {
     int rightScore;
 } Ball;
 
-Entity* l, *r;
+Entity* l, *r, *b;
 char score[] = "Score 0|0";
 char* title = score;
 const char* winTitle;
@@ -25,6 +25,7 @@ const char* winTitle;
 Entity* SpawnBall(AppContext* _app, Entity* _entity);
 void FauxBallUpdate(AppContext *_app, Entity *_entity);
 void Victory(AppContext* _app, Entity* _entity);
+void TrailBallUpdate(AppContext* _app, Entity* _entity);
 
 void BallStart(AppContext* _app, Entity* _entity) {
     _entity->color = InitVector4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -38,7 +39,7 @@ void BallUpdate(AppContext* _app, Entity* _entity) {
 
     if (GetKeyDown(_app, SDL_SCANCODE_P))
     {
-        SpawnBall(_app, _entity);
+        //SpawnBall(_app, _entity);
     }
 
     if (Vec2EqualsZero(_entity->velocity) && GetKeyDown(_app, SDL_SCANCODE_SPACE))
@@ -46,10 +47,10 @@ void BallUpdate(AppContext* _app, Entity* _entity) {
         i32 startingDirection = rand() % 4;
 
         static Vector2 directions[4] = {
-            (Vector2){0.72f, 0.5f},
-            (Vector2){0.72f, -0.5f},
-            (Vector2){-0.72f, 0.5f},
-            (Vector2){-0.72f, -0.5f},
+            (Vector2){0.72f, 0.72f},
+            (Vector2){0.72f, -0.72f},
+            (Vector2){-0.72f, -0.72f},
+            (Vector2){-0.72f, -0.72f},
         };
         _entity->velocity = Vec2Mul(directions[startingDirection], 150.0f);
     }
@@ -73,19 +74,20 @@ void BallUpdate(AppContext* _app, Entity* _entity) {
         _entity->velocity = InitVector2(0.0f, 0.0f);
         _entity->transform.position = InitVector3(_app->windowWidth * 0.5f, _app->windowHeight * 0.5f, 0.0f);
         // win
-        if (*(int *) (_entity->data) == 5) {
+        if (*(int *) (_entity->data) == 1) {
             Victory(_app, _entity);
         }
     }
         // right (left paddle gets points)
     if (_entity->transform.position.x > _app->windowWidth) {
         *(int *) (_entity->data+4) += 1;
-        title[8] = (char) (*(int*)_entity->data+4)+48;
+        // add memory offset before cast
+        title[8] = (char) (*(int*)(_entity->data+4))+48;
         SetWindowTitle(_app, winTitle);
         _entity->velocity = InitVector2(0.0f, 0.0f);
         _entity->transform.position = InitVector3(_app->windowWidth * 0.5f, _app->windowHeight * 0.5f, 0.0f);
         // win
-        if (*(int *) (_entity->data+4) == 5) {
+        if (*(int *) (_entity->data+4) == 1) {
             Victory(_app, _entity);
         }
     }
@@ -145,6 +147,18 @@ void BallOnDestroy(AppContext* _app, Entity* _entity) {
 void FauxBallUpdate(AppContext* _app, Entity* _entity) {
     Vector3 delta = Vec2ToVec3(Vec2Mul(_entity->velocity, _app->deltaTime));
     _entity->transform.position = Vec3Add(_entity->transform.position, delta);
+}
+
+void TrailBallUpdate(AppContext* _app, Entity* _entity) {
+    b = Find(&_app->scene, "b");
+    _entity->color = b->color;
+    _entity->transform.scale.x -= (32.0f) * _app->deltaTime;
+    _entity->transform.scale.y -= (32.0f) * _app->deltaTime;
+
+    if (_entity->transform.scale.x <= 0.0f) {
+        _entity->transform.position = b->transform.position;
+        _entity->transform.scale = b->transform.scale;
+    }
 }
 
 void Victory(AppContext* _app, Entity* _entity) {
