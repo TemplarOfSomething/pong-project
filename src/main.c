@@ -73,17 +73,6 @@ int main(int argc, char *argv[])
     
     Model model = BuildModel(&vertices, &indices, STATIC_DRAW);
 
-    Entity* ball = Spawn(&scene);
-    ball->transform.position = InitVector3(app.windowWidth * 0.5f, app.windowHeight * 0.5f, 0.0f);
-    ball->data = calloc(1, sizeof(Ball));
-    ball->image = &circleImage;
-    ball->model = &model;
-    ball->shaderId = shaderProgram;
-    ball->Start = BallStart;
-    ball->Update = BallUpdate;
-    ball->Draw = BallDraw;
-    ball->OnDestroy = BallOnDestroy;
-
     Entity* leftPaddle = Spawn(&scene);
     leftPaddle->name = "lp";
     leftPaddle->transform.position = InitVector3(16.0f, app.windowHeight * 0.5f, 0.0f);
@@ -110,8 +99,22 @@ int main(int argc, char *argv[])
     rightPaddle->Draw = PaddleDraw;
     rightPaddle->OnDestroy = PaddleOnDestroy;
     
+    Entity* ball = Spawn(&scene);
+    ball->name = "b";
+    ball->transform.position = InitVector3(app.windowWidth * 0.5f, app.windowHeight * 0.5f, 0.0f);
+    ball->data = calloc(1, sizeof(Ball));
+    ball->image = &circleImage;
+    ball->model = &model;
+    ball->shaderId = shaderProgram;
+    ball->Start = BallStart;
+    ball->Update = BallUpdate;
+    ball->Draw = BallDraw;
+    ball->OnDestroy = BallOnDestroy;
+
     bool running = true;
     f32 time = 0.0f;
+    SetWindowTitle(&app, "Score 0|0");
+
     while(running) {
         // input
         InputManagerNewFrame(&app);

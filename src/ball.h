@@ -1,32 +1,37 @@
 #pragma once
+#include "SDL3/SDL_stdinc.h"
 #include "cpup/canis.h"
+#include "cpup/entity.h"
 #include "cpup/io.h"
 #include "cpup/math.h"
 #include "cpup/scene.h"
 #include "cpup/model.h"
 #include "cpup/inputmanager.h"
+#include "cpup/window.h"
 
 #include <SDL3/SDL.h>
 
 typedef struct {
     int leftScore;
     int rightScore;
-    Entity* leftPaddle;
-    Entity* rightPaddle;
 } Ball;
 
+Entity* l, *r;
+
+//some functions
 Entity* SpawnBall(AppContext* _app, Entity* _entity);
-void fauxBallUpdate(AppContext *_app, Entity *_entity);
+void FauxBallUpdate(AppContext *_app, Entity *_entity);
+void Victory(AppContext* _app, Entity* _entity);
 
 void BallStart(AppContext* _app, Entity* _entity) {
     _entity->color = InitVector4(1.0f, 1.0f, 1.0f, 1.0f);
     _entity->transform.scale = InitVector3(32.0f, 32.0f, 1.0f);
+    
+    l = Find(&_app->scene, "lp");
+    r = Find(&_app->scene, "rp");
 }
 
 void BallUpdate(AppContext* _app, Entity* _entity) {
-    //lazy method
-    Entity* l = Find(&_app->scene, "lp");
-    Entity* r = Find(&_app->scene, "rp");
 
     if (GetKeyDown(_app, SDL_SCANCODE_P))
     {
@@ -55,23 +60,17 @@ void BallUpdate(AppContext* _app, Entity* _entity) {
         _entity->velocity.y *= -1.0f; 
     }
 
-    // scoring (pointer "fun")
+    // scoring
         // left
     if (_entity->transform.position.x < 0.0f) {
-        *(int *) (_entity->data) += 1;
+        *(int*) (_entity->data) += 1;
+        //((char*) (_entity->data+8))[7] = (char) *(int*)_entity->data;
+        //printf("%s", ((char*) (_entity->data+8)));
         _entity->velocity = InitVector2(0.0f, 0.0f);
         _entity->transform.position = InitVector3(_app->windowWidth * 0.5f, _app->windowHeight * 0.5f, 0.0f);
+        // win
         if (*(int *) (_entity->data) == 1) {
-            for (int i = 0; i < 100; i++) {
-                Entity* temp = SpawnBall(_app, _entity);
-                temp->transform.scale = InitVector3(32.0f, 32.0f, 1.0f);
-                temp->color = InitVector4(0.0f, 0.0f, 1.0f, 1.0f);
-                temp->transform.position = InitVector3(random_float(0.0f, _app->windowWidth), _app->windowHeight - 20.0f, 0.0f);
-                temp->velocity = InitVector2(random_float(-1.5f, 1.5f), random_float(-200.0f, -50.0f));
-                temp->Update = fauxBallUpdate;
-                // overrides color if unchanged
-                temp->Start = NULL;
-            }
+            Victory(_app, _entity);
         }
     }
         // right
@@ -79,14 +78,11 @@ void BallUpdate(AppContext* _app, Entity* _entity) {
         *(int *) (_entity->data+4) += 1;
         _entity->velocity = InitVector2(0.0f, 0.0f);
         _entity->transform.position = InitVector3(_app->windowWidth * 0.5f, _app->windowHeight * 0.5f, 0.0f);
-        if (*(int *) (_entity->data+4) == 5) {
-            
+        // win
+        if (*(int *) (_entity->data+4) == 1) {
+            Victory(_app, _entity);
         }
     }
-
-    //for struct modification do trolling:
-    //*(type*) ptr + offset = value
-    //access should be type var = * ptr + offsett???
 
     // collision
         // right paddle
@@ -140,9 +136,22 @@ void BallOnDestroy(AppContext* _app, Entity* _entity) {
 
 }
 
-void fauxBallUpdate(AppContext* _app, Entity* _entity) {
+void FauxBallUpdate(AppContext* _app, Entity* _entity) {
     Vector3 delta = Vec2ToVec3(Vec2Mul(_entity->velocity, _app->deltaTime));
     _entity->transform.position = Vec3Add(_entity->transform.position, delta);
+}
+
+void Victory(AppContext* _app, Entity* _entity) {
+    for (int i = 0; i < 100; i++) {
+        Entity* temp = SpawnBall(_app, _entity);
+        temp->transform.scale = InitVector3(32.0f, 32.0f, 1.0f);
+        temp->color = _entity->color;
+        temp->transform.position = InitVector3(random_float(0.0f, _app->windowWidth), _app->windowHeight - 20.0f, 0.01f);
+        temp->velocity = InitVector2(random_float(-1.5f, 1.5f), random_float(-200.0f, -50.0f));
+        temp->Update = FauxBallUpdate;
+        // overrides color if unchanged
+        temp->Start = NULL;
+    }
 }
 
 Entity* SpawnBall(AppContext* _app, Entity* _entity) {
