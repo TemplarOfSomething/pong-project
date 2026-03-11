@@ -17,6 +17,9 @@ typedef struct {
 } Ball;
 
 Entity* l, *r;
+char score[] = "Score 0|0";
+char* title = score;
+const char* winTitle;
 
 //some functions
 Entity* SpawnBall(AppContext* _app, Entity* _entity);
@@ -61,25 +64,28 @@ void BallUpdate(AppContext* _app, Entity* _entity) {
     }
 
     // scoring
-        // left
+        // left (right paddle gets points)
     if (_entity->transform.position.x < 0.0f) {
         *(int*) (_entity->data) += 1;
-        //((char*) (_entity->data+8))[7] = (char) *(int*)_entity->data;
-        //printf("%s", ((char*) (_entity->data+8)));
+        // cast void* to int*, dereference int* to get int, add 48 to get ASCII number then cast to char
+        title[6] = (char) (*(int*)_entity->data)+48;
+        SetWindowTitle(_app, winTitle);
         _entity->velocity = InitVector2(0.0f, 0.0f);
         _entity->transform.position = InitVector3(_app->windowWidth * 0.5f, _app->windowHeight * 0.5f, 0.0f);
         // win
-        if (*(int *) (_entity->data) == 1) {
+        if (*(int *) (_entity->data) == 5) {
             Victory(_app, _entity);
         }
     }
-        // right
+        // right (left paddle gets points)
     if (_entity->transform.position.x > _app->windowWidth) {
         *(int *) (_entity->data+4) += 1;
+        title[8] = (char) (*(int*)_entity->data+4)+48;
+        SetWindowTitle(_app, winTitle);
         _entity->velocity = InitVector2(0.0f, 0.0f);
         _entity->transform.position = InitVector3(_app->windowWidth * 0.5f, _app->windowHeight * 0.5f, 0.0f);
         // win
-        if (*(int *) (_entity->data+4) == 1) {
+        if (*(int *) (_entity->data+4) == 5) {
             Victory(_app, _entity);
         }
     }

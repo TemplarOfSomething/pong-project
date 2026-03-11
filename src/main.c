@@ -113,7 +113,8 @@ int main(int argc, char *argv[])
 
     bool running = true;
     f32 time = 0.0f;
-    SetWindowTitle(&app, "Score 0|0");
+    winTitle = title;
+    SetWindowTitle(&app, winTitle);
 
     while(running) {
         // input
