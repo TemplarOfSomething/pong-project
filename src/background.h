@@ -6,8 +6,6 @@
 #include "cpup/math.h"
 #include "cpup/scene.h"
 #include "cpup/model.h"
-#include "cpup/inputmanager.h"
-#include "cpup/window.h"
 
 #include <SDL3/SDL.h>
 

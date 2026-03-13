@@ -102,8 +102,12 @@ void BallUpdate(AppContext* _app, Entity* _entity) {
         r->transform.position.y - _entity->transform.scale.y) * 0.5 && 
         (_entity->transform.position.y - _entity->transform.scale.y * 0.5f <=
         r->transform.position.y + _entity->transform.scale.y * 0.5)) {
-            _entity->velocity.x *= -1.0f;
+            _entity->velocity.x *= -1.1f;
             _entity->color = InitVector4(0.0f, 0.0f, 1.0f, 1.0f);
+            //"bounce"
+            r->transform.scale.x *= 0.75f;
+            r->transform.scale.y *= 1.25f;
+            *(float *)r->data = _app->deltaTime + 5e-8;
         }
     }
         // left paddle
@@ -113,8 +117,12 @@ void BallUpdate(AppContext* _app, Entity* _entity) {
         l->transform.position.y - _entity->transform.scale.y) * 0.5 && 
         (_entity->transform.position.y - _entity->transform.scale.y * 0.5f <=
         l->transform.position.y + _entity->transform.scale.y * 0.5)) {
-            _entity->velocity.x *= -1.0f;
+            _entity->velocity.x *= -1.1f;
             _entity->color = InitVector4(1.0f, 0.0f, 0.0f, 1.0f);
+            // "bounce"
+            l->transform.scale.x *= 0.75f;
+            l->transform.scale.y *= 1.25f;
+            *(float *)l->data = _app->deltaTime + 5e-8;
         }
     }
 

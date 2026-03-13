@@ -7,7 +7,7 @@
 #include <string.h>
 
 typedef struct {
-    int var;
+    float refresh;
 } Paddle;
 
 void PaddleStart(AppContext* _app, Entity* _entity) {
@@ -30,6 +30,12 @@ void PaddleUpdate(AppContext* _app, Entity* _entity) {
 
     if (GetKey(_app, SDL_SCANCODE_DOWN) && strcmp(_entity->name, "lp")) {
         _entity->transform.position.y -= 5.0f;
+    }
+
+    // bounce reset
+    if (_entity->transform.scale.y == 160.0f && *((float *)_entity->data) < _app->deltaTime) {
+        _entity->transform.scale.x = 32.0f;
+        _entity->transform.scale.y = 128.0f;
     }
 }
 
