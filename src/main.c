@@ -25,6 +25,7 @@
 
 #include "ball.h"
 #include "paddle.h"
+#include "background.h"
 
 AppContext app;
 
@@ -52,6 +53,7 @@ int main(int argc, char *argv[])
     
     // build and compile our shader program
     u32 shaderProgram = GenerateShaderFromFiles("assets/shaders/logo.vs", "assets/shaders/logo.fs");
+    u32 bgProgram = GenerateShaderFromFiles("assets/shaders/bg.vs", "assets/shaders/bg.fs");
     printf("shaderID: %i\n", shaderProgram);
 
     float ve[] = {
@@ -119,11 +121,11 @@ int main(int argc, char *argv[])
     bg->data = calloc(1, sizeof(Ball));
     bg->image = &gridImage;
     bg->model = &model;
-    bg->shaderId = shaderProgram;
-    //bg->Start = BallStart;
-    //bg->Update = BallUpdate;
-    bg->Draw = BallDraw;
-    //bg->OnDestroy = BallOnDestroy;
+    bg->shaderId = bgProgram;
+    //bg->Start = BackgroundStart;
+    //bg->Update = BackgroundUpdate;
+    bg->Draw = BackgroundDraw;
+    //bg->OnDestroy = BackgroundOnDestroy;
 
     // trail
     for (int i = 0; i < 9; i++) {
